@@ -1,9 +1,9 @@
 package com.ulalala.board_jpa.dto.board;
 
+import com.ulalala.board_jpa.domain.Paging;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import spring.board.domain.Paging;
 
 
 @Data

@@ -1,8 +1,8 @@
 package com.ulalala.board_jpa.dto.common;
 
+import com.ulalala.board_jpa.domain.Paging;
 import lombok.Getter;
 import lombok.Setter;
-import spring.board.domain.Paging;
 
 @Getter
 @Setter

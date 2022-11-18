@@ -1,11 +1,13 @@
 package com.ulalala.board_jpa.dto.board;
 
+import com.ulalala.board_jpa.domain.Board;
+import com.ulalala.board_jpa.dto.comment.CommentDto;
+import com.ulalala.board_jpa.dto.file.FileResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import spring.board.dto.comment.CommentDto;
-import spring.board.dto.file.FileResponse;
+
 
 import java.util.List;
 
@@ -14,9 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoardInfoResponse {
-    private BoardResponse boardResponse;
+    private Board board;
     private FileResponse fileResponse;
-//    private List<CommentResponse> commentDtos;
     private List<CommentDto> commentDtos;
 }
 
