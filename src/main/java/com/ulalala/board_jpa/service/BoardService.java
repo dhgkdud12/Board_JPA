@@ -7,7 +7,6 @@ import com.ulalala.board_jpa.domain.FileEntity;
 import com.ulalala.board_jpa.domain.Paging;
 import com.ulalala.board_jpa.dto.board.*;
 import com.ulalala.board_jpa.dto.common.PageInfo;
-import com.ulalala.board_jpa.dto.file.FileRequest;
 import com.ulalala.board_jpa.dto.file.FileResponse;
 import com.ulalala.board_jpa.dto.user.UserSession;
 import com.ulalala.board_jpa.common.response.CommonResponse;
@@ -16,10 +15,10 @@ import com.ulalala.board_jpa.common.response.SuccessMessage;
 import com.ulalala.board_jpa.common.response.exception.ErrorCode;
 import com.ulalala.board_jpa.common.response.exception.TicketingException;
 import com.ulalala.board_jpa.util.SessionUtils;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
@@ -72,10 +71,9 @@ public class BoardService {
     }
 
     public PageInfo getPagingInfo(int page, int size, int blockSize) {
-//        Paging paging = new Paging(page, size, blockSize, boardMapper.getTotalCnt());
-//        PageInfo pageInfo = new PageInfo(paging);
-//        return pageInfo;
-        return null;
+        Paging paging = new Paging(page, size, blockSize, (int) boardRepository.count());
+        PageInfo pageInfo = new PageInfo(paging);
+        return pageInfo;
     }
 
     public BoardInfoResponse selectPostByPostId(Integer bIdx) {
@@ -97,30 +95,27 @@ public class BoardService {
     public List<BoardResponse> selectPostsByUserId(int page, int size, int blockSize) {
         UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
 
-//        if (userSession != null) {
-//            Paging paging = new Paging(page, size, blockSize, boardMapper.getTotalCnt());
-//            Map<String, Integer> map = new HashMap<>();
-//            map.put("startIndex", paging.getStartIndex());
-//            map.put("endIndex", paging.getEndIndex());
-//            map.put("id", userSession.getIdx());
+        if (userSession != null) {
+            Paging paging = new Paging(page, size, blockSize, (int) boardRepository.count());
+            Map<String, Integer> map = new HashMap<>();
+            map.put("startIndex", paging.getStartIndex());
+            map.put("endIndex", paging.getEndIndex());
+            map.put("id", userSession.getIdx());
 //            List<BoardResponse> list = boardMapper.selectPostsByUserId(map);
 //            return list;
-//        } else {
-//            throw new TicketingException(ErrorCode.INVALID_LOGIN);
-//        }
+        } else {
+            throw new TicketingException(ErrorCode.INVALID_LOGIN);
+        }
         return null;
     }
 
+    @Transactional
     public CommonResponse updatePost(int bIdx, BoardRequest boardRequest) {
         UserSession userSession = (UserSession) SessionUtils.getAttribute("USER");
-        Optional<Board> board = boardRepository.findById(bIdx);
+        Board board = boardRepository.findById(bIdx).orElseThrow(() -> new TicketingException(ErrorCode.INVALID_BOARD));
 
-        if (board == null) {
-            throw new TicketingException(ErrorCode.INVALID_BOARD);
-        }
-
-        Integer b_uidx = board.get().getUserIdx();
-        BoardDto boardDto = new BoardDto(board.get());
+        Integer b_uidx = board.getUserIdx();
+        BoardEditor boardEditor = new BoardEditor(board);
 
         if (userSession == null ) {
             throw new TicketingException(ErrorCode.INVALID_LOGIN);
@@ -128,35 +123,21 @@ public class BoardService {
             if (!b_uidx.equals(userSession.getIdx())) {
                 throw new TicketingException(ErrorCode.INVALID_USER);
             } else {
-                if (board.isPresent()) {
-                    BoardUpdateRequest boardUpdateRequest = new BoardUpdateRequest(bIdx, boardRequest.getTitle(), boardRequest.getContent(), new Timestamp(new Date().getTime()));
+                // Optional board.ifPresent
 
-                    if (boardRequest.getTitle() != null) {
-                        boardDto.setTitle(boardDto.getTitle());
-                    }
-                    if (boardDto.getContent() != null) {
-                        boardDto.setContent(boardDto.getContent());
-                    }
-
-                    boardRepository.save(boardDto);
+                if (boardRequest.getTitle() != null) {
+                    boardEditor.setTitle(boardRequest.getTitle());
                 }
-                board.ifPresent(t -> {
-                    BoardUpdateRequest boardUpdateRequest = new BoardUpdateRequest(bIdx, boardRequest.getTitle(), boardRequest.getContent(), new Timestamp(new Date().getTime()));
+                if (boardRequest.getContent() != null) {
+                    boardEditor.setContent(boardRequest.getContent());
+                }
 
-                    if (boardRequest.getTitle() != null) {
-                        t.setTitle(boardDto.getTitle());
-                    }
-                    if (boardDto.getContent() != null) {
-                        t.setContent(boardDto.getContent());
-                    }
+                board.edit(boardEditor);
 
-                    boardRepository.save(t);
-                });
-
+                boardRepository.save(board); // update
                 return new CommonResponse<>(ResponseStatus.SUCCESS, 200, "게시물 " + SuccessMessage.SUCCESS_UPDATE.getMessage(), null);
             }
         }
-        return null;
     }
 
     public CommonResponse deletePost(int bIdx) {

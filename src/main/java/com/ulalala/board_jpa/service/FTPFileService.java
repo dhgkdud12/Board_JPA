@@ -98,8 +98,7 @@ public class FTPFileService {
 
         FileEntity fileEntity = new FileEntity(null, bIdx, onlyFName, convertName, filePath, fileE, fileSize);
 
-        if (
-                fileRepository.save(fileEntity) != null) return SuccessMessage.SUCCESS_FILE_UP.getMessage();
+        if (fileRepository.save(fileEntity) != null) return SuccessMessage.SUCCESS_FILE_UP.getMessage();
         else throw new TicketingException(ErrorCode.FAIL_FILE_UP);
     }
 
@@ -119,7 +118,7 @@ public class FTPFileService {
         HttpHeaders headers = new HttpHeaders();
         Resource resource = null;
 
-        Optional<FileEntity> g_file = fileRepository.findById(fIdx);
+        FileEntity g_file = fileRepository.findById(fIdx).get();
         String path = g_file.getPath(); // 파일 경로 얻기
 
         FTPClient ftpClient = new FTPClient();

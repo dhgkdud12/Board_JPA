@@ -1,17 +1,14 @@
 package com.ulalala.board_jpa.dto.board;
 
 import com.ulalala.board_jpa.domain.Board;
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
-public class BoardDto {
+public class BoardEditor {
 
     private Integer boardNo;
 
@@ -25,7 +22,7 @@ public class BoardDto {
 
     private Timestamp updateDate;
 
-    public BoardDto(Board board) {
+    public BoardEditor(Board board) {
         this.boardNo = board.getBoardNo();
         this.title = board.getTitle();
         this.content = board.getContent();
