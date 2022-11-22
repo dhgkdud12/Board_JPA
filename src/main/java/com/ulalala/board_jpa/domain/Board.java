@@ -1,19 +1,18 @@
 package com.ulalala.board_jpa.domain;
 
-import com.ulalala.board_jpa.dto.board.BoardEditor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 @Getter
-@Builder
 @NoArgsConstructor
 @Entity
+@ToString
 public class Board {
 
     @Id
@@ -36,9 +35,8 @@ public class Board {
     private Timestamp updateDate;
 
     @OneToMany
-    @JoinColumn
+    @JoinColumn(name = "boardNo")
     private List<Comment> comments;
-
 
     @Builder // 생성자에 @Builder 적용
     public Board(Integer boardNo, String title, String content, Integer userIdx, Timestamp createDate, Timestamp updateDate) {
@@ -50,9 +48,9 @@ public class Board {
         this.updateDate = updateDate;
     }
 
-    public void edit(BoardEditor boardEditor) {
-        title = boardEditor.getTitle();
-        content = boardEditor.getContent();
-        updateDate = new Timestamp(new Date().getTime());
-    }
+//    public void edit(BoardEditor boardEditor) {
+//        title = boardEditor.getTitle();
+//        content = boardEditor.getContent();
+//        updateDate = new Timestamp(new Date().getTime());
+//    }
 }
