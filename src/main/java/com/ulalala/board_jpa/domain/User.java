@@ -1,27 +1,37 @@
 package com.ulalala.board_jpa.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import com.ulalala.board_jpa.dto.user.UserRequest;
 
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
 
-@Getter
-@Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Entity
 // 사용자
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idx;
+    @Column(nullable = false)
     private String id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private Timestamp joinDate;
 
+
+    @Builder
     public User(UserRequest userRequest) {
         this.id = userRequest.getId();
         this.name = userRequest.getName();

@@ -1,28 +1,42 @@
 package com.ulalala.board_jpa.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import javax.persistence.*;
 
 @Getter
-@Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@Entity(name = "file")
 public class FileEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer fileNo;
     private Integer boardNo;
 
-    // 원본 파일명
+    @Column(nullable = false)
     private String fileName;
-    // 변환 파일명
+
+    @Column(nullable = false)
     private String convertName;
-    // 파일 경로
+
+    @Column(nullable = false)
     private String path;
-    // 파일 확장자
+
+    @Column(nullable = false)
     private String extension;
-    //파일 크기
+
+    @Column(nullable = false)
     private Long size;
 
+    @Builder
+    public FileEntity(Integer fileNo, Integer boardNo, String fileName, String convertName, String path, String extension, Long size) {
+        this.fileNo = fileNo;
+        this.boardNo = boardNo;
+        this.fileName = fileName;
+        this.convertName = convertName;
+        this.path = path;
+        this.extension = extension;
+        this.size = size;
+    }
 }
